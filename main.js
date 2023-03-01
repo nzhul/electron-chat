@@ -20,7 +20,7 @@ function createWindow() {
   });
 
   win.loadFile("index.html");
-  isDev && win.webContents.openDevTools();
+  // isDev && win.webContents.openDevTools();
 }
 
 if (isDev) {
