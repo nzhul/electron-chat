@@ -5,7 +5,7 @@ const isDev = !app.isPackaged;
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1200,
+    width: 1600,
     height: 800,
     backgroundColor: "white",
     autoHideMenuBar: true,
@@ -20,7 +20,7 @@ function createWindow() {
   });
 
   win.loadFile("index.html");
-  // isDev && win.webContents.openDevTools();
+  isDev && win.webContents.openDevTools();
 }
 
 if (isDev) {

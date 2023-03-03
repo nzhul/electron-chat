@@ -1,15 +1,20 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, applyMiddleware } from "@reduxjs/toolkit";
+import thunkMiddleware from "redux-thunk";
+import authReducer from "../reducers/auth";
+import chatReducer from "../reducers/chats";
 
 export default function initStore() {
-  const store = configureStore({
-    reducer: (state) => {
-      return {
-        message: "Hello World",
-        data1: "just some testing data",
-        data2: "just some testing data 2",
-      };
+  const middlewares = [thunkMiddleware];
+
+  const store = configureStore(
+    {
+      reducer: {
+        chats: chatReducer,
+        auth: authReducer,
+      },
     },
-  });
+    applyMiddleware(...middlewares)
+  );
 
   return store;
 }

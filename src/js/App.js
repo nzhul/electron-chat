@@ -1,30 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import Home from "./views/Home";
 
 import { HashRouter, Route, Routes } from "react-router-dom";
 import NavBar from "./components/Navbar";
 import Settings from "./views/Settings";
-import Login from "./views/Login";
-import Register from "./views/Register";
+import Welcome from "./views/Welcome";
 import Chat from "./views/Chat";
 
 import initStore from "./store";
+import { listenToAuthChanges } from "./actions/auth";
 
 const store = initStore();
 
 const App = () => {
+  useEffect(() => {
+    store.dispatch(listenToAuthChanges());
+  }, []);
+
   return (
     <Provider store={store}>
       <HashRouter>
         <NavBar />
         <div className="content-wrapper">
           <Routes>
+            <Route path="/home" element={<Home />} />
             <Route path="/chat/:id" element={<Chat />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Welcome />} />
           </Routes>
         </div>
       </HashRouter>
