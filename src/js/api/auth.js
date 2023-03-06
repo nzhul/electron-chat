@@ -1,6 +1,18 @@
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import db from "../db/firestore";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, where, query, getDocs } from "firebase/firestore";
+
+export const getUserProfile = async (uid) => {
+  // TODO: this needs a fix, refer to the documentation.
+  const q = query(collection(db, "profiles"), where("uid", "==", uid));
+
+  const querySnapshot = await getDocs(q);
+  console.log(querySnapshot[0].data());
+};
 
 export async function register({ email, password, username, avatar }) {
   try {
@@ -22,6 +34,15 @@ export async function register({ email, password, username, avatar }) {
     Promise.reject(error.message);
   }
 }
+
+export const login = ({ email, password }) => {
+  const auth = getAuth();
+  return signInWithEmailAndPassword(auth, email, password);
+};
+
+export const logout = () => {
+  return getAuth().signOut();
+};
 
 export const onAuthStateChanges = (onAuth) => {
   const auth = getAuth();
