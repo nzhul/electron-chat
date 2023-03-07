@@ -1,14 +1,43 @@
 // Main Process
-const { app, BrowserWindow, Notification, ipcMain } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  Notification,
+  ipcMain,
+  Menu,
+  Tray,
+} = require("electron");
 const path = require("path");
 const isDev = !app.isPackaged;
+
+const dockIcon = path.join(__dirname, "assets", "images", "react_app_logo.png");
+const trayIcon = path.join(__dirname, "assets", "images", "react_icon.png");
+
+function createSplashWindow() {
+  const win = new BrowserWindow({
+    width: 400,
+    height: 200,
+    backgroundColor: "#6e707e",
+    frame: false,
+    transparent: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  win.loadFile("splash.html");
+
+  return win;
+}
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 1600,
     height: 800,
     backgroundColor: "white",
-    autoHideMenuBar: true,
+    show: false,
+    // autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
 
@@ -21,6 +50,8 @@ function createWindow() {
 
   win.loadFile("index.html");
   isDev && win.webContents.openDevTools();
+
+  return win;
 }
 
 if (isDev) {
@@ -29,8 +60,33 @@ if (isDev) {
   });
 }
 
+if (process.platform === "darwin") {
+  app.dock.setIcon(dockIcon);
+}
+
+let tray = null;
+
 app.whenReady().then(() => {
-  createWindow();
+  const template = require("./utils/Menu").createTemplate(app);
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
+  tray = new Tray(trayIcon);
+  tray.setContextMenu(menu);
+
+  const splash = createSplashWindow();
+  const mainApp = createWindow();
+
+  mainApp.once("ready-to-show", () => {
+    // splash.destroy();
+    // mainApp.show();
+
+    // Artificial/Fake delay of 0.5 seconds.
+    setTimeout(() => {
+      splash.destroy();
+      mainApp.show();
+    }, 500);
+  });
 });
 
 ipcMain.on("notify", (e, message) => {
